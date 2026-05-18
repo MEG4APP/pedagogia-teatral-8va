@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formación en Pedagogía Teatral - 8va Versión</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- GSAP & ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        'brand-bg': '#0a0c0b',       // Darkest background (almost black)
+        'brand-dark': '#151819',     // Secondary dark (for containers)
+        'brand-accent': '#e4531b',   // Burnt Orange from the door
+        'brand-card': '#1a1d1e',     // Slightly lighter dark for bento cards
+        'brand-text': '#e5dcc3',     // Cream text for high contrast
+        'brand-muted': '#a39f96'     // Muted cream for secondary text
+      },
+      fontFamily: {
+        'sans': ['Inter', 'sans-serif'],
+        'display': ['Bebas Neue', 'sans-serif']
+      }
+    }
+  }
+}
+</script>
+<style>
+body {
+  background-color: #0a0c0b;
+  color: #e5dcc3;
+  -webkit-font-smoothing: antialiased;
+}
+.font-display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
+
+/* Bento Grid classes */
+.bento-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, 1fr);
+}
+@media (min-width: 768px) {
+  .bento-grid { grid-template-columns: repeat(3, 1fr); }
+  .bento-span-2 { grid-column: span 2; }
+  .bento-span-3 { grid-column: span 3; }
+}
+
+.bento-card {
+  background: #1a1d1e;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.bento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+  border-color: rgba(228, 83, 27, 0.3); /* Subtle accent glow */
+}
+.bento-card-dark {
+  background: #151819;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Glassmorphism for dark mode */
+.glass-card {
+  background: rgba(26, 29, 30, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 1rem;
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 300px;
+  max-height: 400px;
+}
+@media (min-width: 768px) {
+  .chart-container { height: 350px; }
+}
+
+/* Accordion smoother transition */
+.accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.accordion-content.active {
+  grid-template-rows: 1fr;
+}
+.accordion-inner {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.accordion-content.active .accordion-inner {
+  opacity: 1;
+}
+
+.nav-link {
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: #e4531b;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
+
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.magnetic-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(228, 83, 27, 0.4);
+}
+</style>
+</head>
+<body class="font-sans antialiased selection:bg-brand-accent selection:text-white">
+
+<nav class="fixed top-0 w-full bg-brand-bg/90 backdrop-blur-md z-50 border-b border-brand-card/50">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="font-display text-2xl tracking-widest text-brand-text cursor-pointer hover:scale-105 transition-transform">RC<span class="text-brand-accent">T</span></div>
+    <div class="hidden md:flex space-x-8 text-sm font-medium tracking-wide">
+      <a href="#enfoque" class="nav-link text-brand-text uppercase">Enfoque</a>
+      <a href="#dinamica" class="nav-link text-brand-text uppercase">Dinámica</a>
+      <a href="#programa" class="nav-link text-brand-text uppercase">Programa</a>
+      <a href="#equipo" class="nav-link text-brand-text uppercase">Equipo</a>
+    </div>
+    <a href="#contacto" class="bg-brand-accent text-white px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-[#d04616] transition-colors magnetic-btn rounded-sm shadow-lg shadow-brand-accent/20">Inscripción</a>
+  </div>
+</nav>
+
+<header class="pt-[72px] bg-brand-bg text-white flex flex-col items-center overflow-hidden" id="hero-section">
+  <!-- Image container for parallax -->
+  <div class="w-full relative h-[70vh] overflow-hidden">
+    <img src="Imagenes/afiche-3-nuevo.png" alt="Afiche Formación en Pedagogía Teatral 8va Versión" class="absolute inset-0 w-full h-full object-cover hero-img border-b-4 border-brand-accent shadow-2xl origin-bottom">
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-transparent opacity-90"></div>
+  </div>
+  
+  <div class="w-full bg-brand-bg py-12 px-6 hero-text z-10 relative">
+    <div class="max-w-4xl mx-auto text-center">
+      <p class="text-lg md:text-2xl font-light text-brand-text max-w-2xl mx-auto italic leading-relaxed mb-10 hero-quote drop-shadow-md">
+        "Una formación para diseñar, diagnosticar y facilitar talleres de teatro con rigor, criterio y fundamentación."
+      </p>
+      
+      <div class="flex flex-wrap justify-center gap-8 md:gap-16 text-sm hero-stats">
+        <div class="flex flex-col items-center group">
+          <span class="text-brand-accent uppercase tracking-widest text-[11px] font-bold mb-1 group-hover:scale-110 transition-transform">Duración</span>
+          <span class="text-brand-text text-base">6 Meses (Abr - Sep)</span>
+        </div>
+        <div class="flex flex-col items-center group">
+          <span class="text-brand-accent uppercase tracking-widest text-[11px] font-bold mb-1 group-hover:scale-110 transition-transform">Modalidad</span>
+          <span class="text-brand-text text-base">Virtual + Práctica Real</span>
+        </div>
+        <div class="flex flex-col items-center group">
+          <span class="text-brand-accent uppercase tracking-widest text-[11px] font-bold mb-1 group-hover:scale-110 transition-transform">Carga</span>
+          <span class="text-brand-text text-base">~100 Horas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="enfoque" class="py-24 px-6 relative bg-brand-bg">
+  <div class="max-w-5xl mx-auto">
+    <div class="mb-16 gs-reveal">
+      <h2 class="font-display text-5xl text-brand-text mb-4">Nuestro Enfoque</h2>
+      <p class="text-base font-light text-brand-muted max-w-2xl leading-relaxed">
+        Comprende la filosofía detrás de esta formación. Aquí detallamos nuestras convicciones pedagógicas, lo que te llevarás al finalizar y para quién está diseñado este espacio de aprendizaje profundo.
+      </p>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="bento-grid">
+      <!-- Card 1: Filosofia (Span 2) -->
+      <div class="bento-card bento-span-2 gs-reveal">
+        <div class="text-3xl font-display text-brand-text border-l-4 border-brand-accent pl-5 mb-8 leading-tight">
+          "Nadie llega vacío.<br>Nadie llega sin historia."
+        </div>
+        <p class="text-sm font-light leading-relaxed mb-5 text-gray-300">
+          El teatro nos convoca a un diálogo profundo con nosotros mismos y con el mundo que habitamos. No como ornamento cultural, sino como <strong class="font-semibold text-brand-text">vehículo de aprendizaje</strong>: un sistema sofisticado que activa simultáneamente procesos cognitivos, emocionales, corporales y relacionales que la pedagogía convencional trabaja por separado.
+        </p>
+        <p class="text-sm font-light leading-relaxed mb-5 text-gray-300">
+          Nuestra propuesta se sostiene en tres convicciones: reconocemos y valoramos el saber previo con el que llegas; creemos que la teoría cobra sentido vital únicamente a través de la práctica aplicada; y defendemos una pedagogía teatral con una identidad epistemológica propia latinoamericana.
+        </p>
+        <div class="bg-brand-dark p-4 rounded-md mt-6 border-l-2 border-brand-accent">
+          <p class="text-xs font-medium text-brand-text leading-relaxed">
+            A lo largo de 6 meses, con 26 encuentros sincrónicos de 2.5 horas cada uno, dos docentes con trayectorias complementarias, y la exigencia de trabajar con un grupo real desde el tercer mes, esta formación te acompaña a construir algo concreto.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2: Que ofrece (Span 1) -->
+      <div class="bento-card bento-card-dark gs-reveal" style="transition-delay: 0.1s;">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-brand-accent mb-6 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-brand-accent"></span>
+          ¿Qué ofrece esta formación?
+        </h3>
+        <ul class="space-y-6 text-sm font-light">
+          <li class="flex items-start">
+            <div>
+              <strong class="font-semibold text-brand-text block text-base mb-1">Marco teórico de alta densidad</strong>
+              <span class="text-xs text-brand-muted">Teatro Físico, Antropología teatral y Creación Colectiva, Neurociencias, Freire/Boal, integrados como sistema operativo.</span>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <div>
+              <strong class="font-semibold text-brand-text block text-base mb-1">Práctica con grupo real</strong>
+              <span class="text-xs text-brand-muted">Desde el tercer mes aplicas herramientas con un grupo propio.</span>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <div>
+              <strong class="font-semibold text-brand-text block text-base mb-1">Diagnóstico como competencia</strong>
+              <span class="text-xs text-brand-muted">Aprendes a leer un grupo antes de intervenir (sociología, psicología, psicopedagogía).</span>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <div>
+              <strong class="font-semibold text-brand-text block text-base mb-1">Producto concreto de egreso</strong>
+              <span class="text-xs text-brand-muted">Sales con diagnóstico, programa de 16-18h y bitácora de 6 meses.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Card 3: A Quien (Span 3) -->
+      <div class="bento-card bento-span-3 gs-reveal mt-4 border border-white/5">
+        <h3 class="font-display text-3xl text-brand-text mb-8">¿A quién está dirigida?</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="group">
+            <div class="w-10 h-10 rounded-full bg-brand-dark border border-white/5 flex items-center justify-center text-brand-accent font-display text-xl mb-4 group-hover:scale-110 group-hover:bg-brand-accent group-hover:text-white transition-all">01</div>
+            <strong class="text-xl font-display tracking-wide block mb-2 text-brand-text">Artistas escénicos</strong>
+            <p class="text-sm font-light leading-relaxed text-gray-400">Que desean formalizar y sistematizar su práctica, traduciendo experiencia en metodología transmisible.</p>
+          </div>
+          <div class="group">
+            <div class="w-10 h-10 rounded-full bg-brand-dark border border-white/5 flex items-center justify-center text-brand-accent font-display text-xl mb-4 group-hover:scale-110 group-hover:bg-brand-accent group-hover:text-white transition-all">02</div>
+            <strong class="text-xl font-display tracking-wide block mb-2 text-brand-text">Docentes y educadores</strong>
+            <p class="text-sm font-light leading-relaxed text-gray-400">De cualquier nivel que quieren integrar el teatro como herramienta pedagógica con rigor teórico.</p>
+          </div>
+          <div class="group">
+            <div class="w-10 h-10 rounded-full bg-brand-dark border border-white/5 flex items-center justify-center text-brand-accent font-display text-xl mb-4 group-hover:scale-110 group-hover:bg-brand-accent group-hover:text-white transition-all">03</div>
+            <strong class="text-xl font-display tracking-wide block mb-2 text-brand-text">Profesionales afines</strong>
+            <p class="text-sm font-light leading-relaxed text-gray-400">(Psicología, trabajo social, talleristas) que reconocen en el teatro un vehículo de transformación.</p>
+          </div>
+        </div>
+        
+        <div class="mt-10 bg-[#251510] border border-brand-accent/20 p-6 rounded-lg flex items-start sm:items-center gap-5 shadow-lg relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-32 h-32 bg-brand-accent opacity-10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+          <div class="text-4xl font-display text-brand-accent tracking-widest z-10 flex-shrink-0">!</div>
+          <div class="z-10">
+            <strong class="uppercase tracking-widest text-[11px] font-bold block mb-1 text-brand-accent">Requisito Fundamental</strong>
+            <p class="text-sm font-light text-brand-text/90">Los primeros dos meses son para buscar, convocar y formar tu grupo. Desde el tercer mes, la práctica aplicada comienza. Sin grupo real, la práctica central de la formación no puede realizarse.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="dinamica" class="py-24 px-6 bg-brand-dark relative overflow-hidden">
+  <div class="absolute top-0 right-0 w-1/2 h-full bg-brand-bg/50 skew-x-12 transform origin-top-right"></div>
+  <div class="max-w-5xl mx-auto relative z-10">
+    <div class="mb-16 text-center gs-reveal">
+      <h2 class="font-display text-5xl text-brand-text mb-4">La Dinámica de Trabajo</h2>
+      <p class="text-base font-light text-brand-muted max-w-2xl mx-auto leading-relaxed">
+        Explora cómo se distribuye tu tiempo y esfuerzo durante los 6 meses. La formación exige un balance estratégico entre las sesiones en vivo y tu trabajo autónomo.
+      </p>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-16 items-center">
+      <div class="w-full md:w-1/2 gs-reveal">
+        <p class="text-sm font-light leading-relaxed mb-6 text-gray-300">
+          La formación se organiza en <strong class="font-semibold text-brand-text">26 encuentros sincrónicos de 2.5 horas</strong>. Cada encuentro tiene una función precisa dentro del arco pedagógico — no son clases independientes sino nodos de un proceso continuo.
+        </p>
+        <p class="text-sm font-light leading-relaxed mb-10 text-gray-300">
+          El trabajo asincrónico es parte constitutiva, no opcional. <strong class="font-semibold text-brand-accent">Desde el tercer mes, cada participante aplica herramientas con su grupo propio y documenta el proceso.</strong> El aprendizaje no ocurre solo en los encuentros — ocurre en lo que pasa entre ellos.
+        </p>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-brand-card/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/5 hover:-translate-y-1 transition-transform">
+            <div class="font-display text-4xl text-brand-text">26</div>
+            <div class="text-[10px] uppercase tracking-widest text-brand-muted font-bold mt-2">Encuentros Sincrónicos</div>
+          </div>
+          <div class="bg-brand-card/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/5 hover:-translate-y-1 transition-transform">
+            <div class="font-display text-4xl text-brand-accent">65h</div>
+            <div class="text-[10px] uppercase tracking-widest text-brand-muted font-bold mt-2">Contacto Directo</div>
+          </div>
+          <div class="bg-brand-card/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/5 hover:-translate-y-1 transition-transform">
+            <div class="font-display text-4xl text-gray-400">6</div>
+            <div class="text-[10px] uppercase tracking-widest text-brand-muted font-bold mt-2">Módulos Temáticos</div>
+          </div>
+          <div class="bg-brand-card/80 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-white/5 hover:-translate-y-1 transition-transform">
+            <div class="font-display text-4xl text-brand-text">~100h</div>
+            <div class="text-[10px] uppercase tracking-widest text-brand-muted font-bold mt-2">Carga Total Estimada</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="w-full md:w-1/2 gs-reveal" style="transition-delay: 0.2s;">
+        <div class="bg-brand-card p-8 rounded-2xl shadow-2xl border border-white/5">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-center text-brand-text mb-8">Distribución de la Carga Horaria</h4>
+          <div class="chart-container">
+            <canvas id="hoursChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="programa" class="py-24 px-6 bg-brand-bg border-y border-white/5">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-16 text-center gs-reveal">
+      <h2 class="font-display text-5xl text-brand-text mb-4">Programa de Formación</h2>
+      <p class="text-base font-light text-brand-muted max-w-2xl mx-auto leading-relaxed mb-8">
+        Navega por los 6 módulos que componen la estructura vertebral de la formación. Haz clic en cada módulo para desplegar los encuentros específicos y su contenido.
+      </p>
+      <div class="inline-block px-6 py-4 bg-brand-dark rounded-full border border-white/10 shadow-lg text-sm font-medium italic text-brand-text relative">
+        <span class="absolute -top-3 -left-3 text-4xl text-brand-accent font-display">"</span>
+        ¿Qué tipo de pedagogo teatral quiero ser, con qué herramientas, para qué personas y desde qué visión del mundo?
+      </div>
+    </div>
+
+    <div class="space-y-4" id="curriculum-container">
+      <!-- Accordions injected via JS -->
+    </div>
+    
+    <!-- Bento Grid for Productos de Egreso -->
+    <div class="mt-24 pt-16 border-t border-white/10 gs-reveal">
+      <h3 class="font-display text-4xl text-brand-text mb-10 text-center">Productos de Egreso</h3>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bento-card group hover:bg-brand-accent hover:border-brand-accent transition-all duration-300">
+          <div class="font-display text-3xl text-brand-accent group-hover:text-white mb-3 transition-colors">01</div>
+          <strong class="text-lg text-brand-text font-semibold block mb-2 group-hover:text-white transition-colors duration-300">Bitácora de proceso completa</strong>
+          <p class="text-sm font-light text-gray-400 group-hover:text-white/90 transition-colors duration-300">Registro reflexivo de los 6 meses de formación.</p>
+        </div>
+        <div class="bento-card group hover:bg-brand-accent hover:border-brand-accent transition-all duration-300">
+          <div class="font-display text-3xl text-brand-accent group-hover:text-white mb-3 transition-colors">02</div>
+          <strong class="text-lg text-brand-text font-semibold block mb-2 group-hover:text-white transition-colors duration-300">Diagnóstico pedagógico</strong>
+          <p class="text-sm font-light text-gray-400 group-hover:text-white/90 transition-colors duration-300">Aplicado al grupo real con herramientas sociológicas y psicopedagógicas.</p>
+        </div>
+        <div class="bento-card group hover:bg-brand-accent hover:border-brand-accent transition-all duration-300">
+          <div class="font-display text-3xl text-brand-accent group-hover:text-white mb-3 transition-colors">03</div>
+          <strong class="text-lg text-brand-text font-semibold block mb-2 group-hover:text-white transition-colors duration-300">Programa de taller</strong>
+          <p class="text-sm font-light text-gray-400 group-hover:text-white/90 transition-colors duration-300">Estructura completa de 16–18 horas diseñada desde el diagnóstico.</p>
+        </div>
+        <div class="bento-card group hover:bg-brand-accent hover:border-brand-accent transition-all duration-300">
+          <div class="font-display text-3xl text-brand-accent group-hover:text-white mb-3 transition-colors">04</div>
+          <strong class="text-lg text-brand-text font-semibold block mb-2 group-hover:text-white transition-colors duration-300">Registro documentado</strong>
+          <p class="text-sm font-light text-gray-400 group-hover:text-white/90 transition-colors duration-300">De la práctica facilitada con el grupo real a partir del 3er mes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="equipo" class="py-24 px-6 bg-[#0f1113] relative overflow-hidden">
+  <!-- Decorative background elements -->
+  <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[50%] bg-brand-accent rounded-full opacity-[0.03] blur-[100px]"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[50%] bg-brand-text rounded-full opacity-[0.02] blur-[100px]"></div>
+
+  <div class="max-w-5xl mx-auto relative z-10">
+    <div class="mb-16 gs-reveal">
+      <h2 class="font-display text-5xl text-brand-text mb-4">El Equipo Docente</h2>
+      <p class="text-base font-light text-brand-muted max-w-2xl leading-relaxed">
+        Conoce a los facilitadores que acompañarán tu proceso formativo a lo largo de los 6 meses.
+      </p>
+    </div>
+
+    <div class="space-y-8">
+      <!-- Docente 1 -->
+      <div class="glass-card p-8 md:p-10 flex flex-col md:flex-row gap-10 items-start gs-reveal">
+        <div class="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative bg-brand-bg">
+          <img src="Imagenes/foto-alejandro.jpg" alt="Alejandro Bustamante" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+        </div>
+        <div class="text-brand-text">
+          <h3 class="font-display text-4xl mb-1">Alejandro Bustamante Gómez</h3>
+          <div class="text-[11px] font-bold tracking-widest uppercase text-brand-accent mb-5">La Paz, Bolivia · 1985</div>
+          <p class="text-sm font-light leading-relaxed mb-6 text-gray-300 max-w-3xl">
+            Director, intérprete y docente teatral. Se formó en el Teatro de los Andes entre 2013 y 2018. Amplió su formación junto a Malayerba, La Candelaria, Yuyachkani, Cristina Castrillo y Kelly Saltz. Ha participado en festivales internacionales en América y Europa. Co-fundador de Raíz Colectiva Teatro, desarrolla investigación en la intersección entre neurociencia cognitiva y pedagogía freireana. Diseña y dirige formaciones online desde 2021.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Teatro físico</span>
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Creación colectiva</span>
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Pedagogía freireana</span>
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Neurociencia aplicada</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Docente 2 -->
+      <div class="glass-card p-8 md:p-10 flex flex-col md:flex-row gap-10 items-start gs-reveal" style="transition-delay: 0.1s;">
+        <div class="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative bg-brand-bg">
+          <img src="Imagenes/foto-celeste.jpg" alt="Celeste Lezcano" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+        </div>
+        <div class="text-brand-text">
+          <h3 class="font-display text-4xl mb-1">Celeste Lezcano</h3>
+          <div class="text-[11px] font-bold tracking-widest uppercase text-brand-accent mb-5">Buenos Aires, Argentina · 1986</div>
+          <p class="text-sm font-light leading-relaxed mb-6 text-gray-300 max-w-3xl">
+            Intérprete escénica, docente y directora teatral radicada en Bolivia. Egresada de la UnSaM (Diplomatura en Creación con Máscaras). Formada en teatro físico (enfoque Lecoq), antropología teatral y junto a maestros del Odin Teatret en Europa. Co-fundadora de Raíz Colectiva Teatro, integra la investigación somática con el diseño de procesos formativos basados en danza teatro y neurociencias del aprendizaje.
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Lecoq</span>
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Danza teatro</span>
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Máscaras</span>
+            <span class="text-[10px] font-medium uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Psicopedagogía</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="py-24 px-6 bg-brand-bg relative overflow-hidden">
+  <div class="absolute bottom-0 left-0 w-full h-1 bg-brand-accent"></div>
+  <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-16 items-center">
+    <div class="w-full md:w-1/2 gs-reveal">
+      <h2 class="font-display text-6xl text-brand-text mb-6">Únete a la<br><span class="text-brand-accent">8va Versión</span></h2>
+      <p class="text-base font-light text-brand-muted mb-10 leading-relaxed">
+        La certificación se otorgará a quienes completen satisfactoriamente la formación, entreguen los productos requeridos y cumplan con la asistencia mínima. Contáctanos para asegurar tu cupo.
+      </p>
+      <div class="space-y-6">
+        <a href="mailto:raizcolectivateatro@gmail.com" class="flex items-center gap-4 group">
+          <div class="w-10 h-10 rounded-full bg-brand-card flex items-center justify-center shadow-md text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-colors border border-white/5">✉</div>
+          <span class="text-sm font-medium text-brand-text group-hover:text-brand-accent transition-colors">raizcolectivateatro@gmail.com</span>
+        </a>
+        <div class="flex items-center gap-4 group">
+          <div class="w-10 h-10 rounded-full bg-brand-card flex items-center justify-center shadow-md text-brand-accent border border-white/5">☏</div>
+          <span class="text-sm font-medium text-brand-text">+591 76465010 · +591 76478586</span>
+        </div>
+        <a href="https://www.instagram.com/raizcolectivateatro/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 group">
+          <div class="w-10 h-10 rounded-full bg-brand-card flex items-center justify-center shadow-md text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-colors border border-white/5">@</div>
+          <span class="text-sm font-bold tracking-widest text-brand-text group-hover:text-brand-accent transition-colors">INSTAGRAM RAIZ COLECTIVA</span>
+        </a>
+      </div>
+    </div>
+    <div class="w-full md:w-1/2 gs-reveal" style="transition-delay: 0.2s;">
+      <div class="bg-brand-card rounded-2xl shadow-2xl p-10 border border-white/5">
+        <h3 class="text-xs uppercase tracking-widest font-bold text-brand-text mb-6 flex items-center gap-3">
+          <span class="w-8 h-[2px] bg-brand-accent"></span>
+          Resumen de Requisitos
+        </h3>
+        <ul class="text-sm font-light space-y-4 text-gray-300">
+          <li class="flex gap-3"><span class="text-brand-accent font-bold">▶</span> Vínculo previo con teatro o educación.</li>
+          <li class="flex gap-3"><span class="text-brand-accent font-bold">▶</span> Acceso a un grupo real de trabajo (se conforma y convoca durante los primeros dos meses; la práctica comienza en el mes 3).</li>
+          <li class="flex gap-3"><span class="text-brand-accent font-bold">▶</span> Conexión estable con cámara y micrófono.</li>
+          <li class="flex gap-3"><span class="text-brand-accent font-bold">▶</span> Compromiso de permanencia activa (mínimo 70% asistencia sincrónica).</li>
+        </ul>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSd3ii5BzTkYdu_-bcGinfV5dQ784fuwdaD-mW6lQ3Av0XqQxA/viewform?usp=preview" target="_blank" class="mt-10 bg-brand-accent text-white py-4 px-8 text-sm font-bold uppercase tracking-widest hover:bg-[#d04616] transition-all duration-300 w-full block text-center rounded-sm magnetic-btn shadow-lg shadow-brand-accent/30">
+          Solicitar Formulario
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-brand-bg py-8 px-6 text-center border-t border-white/5">
+  <div class="text-[10px] font-bold tracking-widest uppercase text-brand-muted/50">
+    © 2026 Raíz Colectiva Teatro · Cochabamba, Bolivia
+  </div>
+</footer>
+
+<script>
+const curriculumData = [
+  {
+    id: "m0",
+    number: "0",
+    title: "Punto de Partida",
+    subtitle: "Nadie llega vacío — nadie llega sin historia",
+    meta: "3 encuentros · Semanas 1–3",
+    encounters: [
+      { num: "01", title: "El pedagogo que ya soy", desc: "Mapeo de trayectoria: experiencia teatral, pedagógica y zona de cruce. Contrato pedagógico colectivo. Pregunta vertebradora de la formación.", doc: "Alejandro + Celeste", asinc: "Bitácora 0 — ¿con qué grupo quiero trabajar?" },
+      { num: "02", title: "Desde dónde enseño", desc: "Del impulso a la opción pedagógica. Distinción entre técnica, herramienta y metodología. Frontera pedagogía teatral / terapia. Neurociencia del aprendizaje mediado por pantalla. Devolución diagnóstica del grupo.", doc: "Alejandro Bustamante", asinc: "Mi territorio pedagógico inicial (7 puntos)" },
+      { num: "03", title: "Presencia sin cuerpo compartido", desc: "El vínculo pedagógico en la distancia. Cómo el teatro — arte de presencia — informa la presencia virtual. Protocolo de continuidad y permanencia construido colectivamente.", doc: "Alejandro Bustamante" }
+    ]
+  },
+  {
+    id: "m1",
+    number: "1",
+    title: "Fundamentos",
+    subtitle: "El teatro como vehículo de aprendizaje",
+    meta: "5 encuentros · Semanas 5–9",
+    encounters: [
+      { num: "05", title: "El teatro no representa: transforma", desc: "Neurociencias y aprendizaje experiencial.", doc: "Celeste Lezcano", asinc: "Lectura activada" },
+      { num: "06", title: "Boal y Freire", desc: "Sistema metodológico, no reverencia.", doc: "Alejandro Bustamante", asinc: "Planificar aplicación T.O." },
+      { num: "07", title: "Pedagogía teatral latinoamericana", desc: "De dónde venimos. Identidad epistemológica.", doc: "Alejandro Bustamante" },
+      { num: "08", title: "El docente como instrumento", desc: "Cuerpo, presencia y ética del rol.", doc: "Celeste Lezcano" },
+      { num: "09", title: "Planificar como acto pedagógico", desc: "Cómo se piensa una clase de teatro antes de darla.", doc: "Alejandro Bustamante", asinc: "Diseñar planificación" }
+    ]
+  },
+  {
+    id: "m2",
+    number: "2",
+    title: "El Cuerpo",
+    subtitle: "El instrumento que siempre está",
+    meta: "5 encuentros · Semanas 10–14",
+    encounters: [
+      { num: "10", title: "Preexpresividad", desc: "El cuerpo antes del personaje. Máscara neutra en virtualidad.", doc: "Celeste Lezcano" },
+      { num: "11", title: "Movimiento y composición", desc: "Principios de Laban aplicados a la enseñanza.", doc: "Celeste Lezcano" },
+      { num: "12", title: "Danza teatro", desc: "El cuerpo que narra. Universo Pina Bausch y traducción pedagógica.", doc: "Celeste Lezcano", asinc: "Aplicar herramienta corporal" },
+      { num: "13", title: "La voz como instrumento pedagógico", desc: "Uso pedagógico de la voz, silencio y consignas.", doc: "Alejandro Bustamante" },
+      { num: "14", title: "Taller de transmisión corporal", desc: "Participantes diseñan y facilitan secuencia de 20 min.", doc: "Alejandro Bustamante" }
+    ]
+  },
+  {
+    id: "m3",
+    number: "3",
+    title: "Creación Colectiva",
+    subtitle: "Crear juntos como acto pedagógico",
+    meta: "5 encuentros · Semanas 15–19",
+    encounters: [
+      { num: "15", title: "Antropología teatral como lente de lectura", desc: "Barba y el ISTA aplicados a la lectura del grupo.", doc: "Celeste Lezcano" },
+      { num: "16", title: "Creación colectiva I", desc: "Metodologías latinoamericanas (Teatro de los Andes).", doc: "Alejandro Bustamante" },
+      { num: "17", title: "Creación colectiva II", desc: "Caja de herramientas comparativa. ¿Qué metodología sirve a qué grupo?", doc: "Alejandro Bustamante", asinc: "Aplicar metodología" },
+      { num: "18", title: "Diseño de procesos creativos pedagógicos", desc: "Secuencias para grupos sin experiencia.", doc: "Celeste Lezcano" },
+      { num: "19", title: "Taller de creación aplicada", desc: "Facilitación y observación entre pares.", doc: "Celeste Lezcano" }
+    ]
+  },
+  {
+    id: "m4",
+    number: "4",
+    title: "Diagnóstico",
+    subtitle: "Leer antes de intervenir",
+    meta: "4 encuentros · Semanas 20–23",
+    encounters: [
+      { num: "20", title: "Diagnóstico sociológico del grupo", desc: "El aula como microsistema social.", doc: "Alejandro Bustamante" },
+      { num: "21", title: "Diagnóstico psicológico del grupo", desc: "Regulación emocional, vinculación y autoridad.", doc: "Alejandro Bustamante" },
+      { num: "22", title: "Diagnóstico psicopedagógico", desc: "Estilos de aprendizaje y zona de desarrollo próximo en el teatro.", doc: "Celeste Lezcano" },
+      { num: "23", title: "Del diagnóstico a la planificación estratégica", desc: "Traducir observaciones a un programa.", doc: "Celeste Lezcano", asinc: "Diagnóstico escrito + programa 16-18hs" }
+    ]
+  },
+  {
+    id: "m5",
+    number: "5",
+    title: "Práctica Integradora",
+    subtitle: "El pedagogo que soy ahora",
+    meta: "3 encuentros · Semanas 24–26",
+    encounters: [
+      { num: "24", title: "Muestras de práctica I", desc: "Facilitación de 30 min y observación con instrumento acordado.", doc: "Alejandro + Celeste" },
+      { num: "25", title: "Muestras de práctica II", desc: "Retroalimentación colectiva profunda.", doc: "Alejandro + Celeste" },
+      { num: "26", title: "Cierre: la pregunta respondida", desc: "Cierre ritual y evidencia de lo vivido.", doc: "Alejandro + Celeste" }
+    ]
+  }
+];
+
+function buildCurriculum() {
+  const container = document.getElementById('curriculum-container');
+  
+  curriculumData.forEach((mod, index) => {
+    const isFirst = index === 0;
+    
+    let encountersHtml = mod.encounters.map(enc => `
+      <div class="flex flex-col sm:flex-row gap-5 py-5 border-t border-white/5 last:border-b-0 group/enc hover:bg-white/5 transition-colors px-6 rounded-lg">
+        <div class="font-display text-2xl text-brand-muted/50 w-10 flex-shrink-0 group-hover/enc:text-brand-accent transition-colors">${enc.num}</div>
+        <div class="flex-1">
+          <h5 class="text-base font-semibold text-brand-text mb-2">${enc.title}</h5>
+          <p class="text-sm font-light text-gray-400 mb-3 leading-relaxed">${enc.desc}</p>
+          <div class="flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-widest font-bold">
+            <span class="bg-brand-bg text-brand-text px-3 py-1.5 rounded-sm border border-white/10">${enc.doc}</span>
+            ${enc.asinc ? `<span class="bg-brand-accent/20 text-brand-accent px-3 py-1.5 rounded-sm border border-brand-accent/20">Asínc: ${enc.asinc}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    const modHtml = `
+      <div class="bg-brand-card rounded-xl shadow-lg border border-white/5 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-brand-accent/30 gs-reveal">
+        <button class="w-full text-left px-6 py-6 sm:px-8 flex items-center justify-between bg-brand-card hover:bg-[#202425] transition-colors" onclick="toggleAccordion('content-${mod.id}', 'icon-${mod.id}', this)">
+          <div class="flex items-center gap-6">
+            <div class="w-14 h-14 bg-brand-bg text-brand-text font-display text-3xl flex items-center justify-center rounded-lg transition-colors border border-white/5 mod-icon">${mod.number}</div>
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-brand-accent font-bold mb-1">${mod.meta}</div>
+              <h4 class="font-display text-3xl text-brand-text leading-none mb-1">${mod.title}</h4>
+              <div class="text-sm font-light text-brand-muted">${mod.subtitle}</div>
+            </div>
+          </div>
+          <div id="icon-${mod.id}" class="text-2xl text-brand-accent font-light transition-transform duration-400 ${isFirst ? 'rotate-180' : ''}">▼</div>
+        </button>
+        <div id="content-${mod.id}" class="accordion-content ${isFirst ? 'active' : ''}">
+          <div class="accordion-inner bg-brand-card pb-4">
+            ${encountersHtml}
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML += modHtml;
+  });
+}
+
+function toggleAccordion(contentId, iconId, btnEl) {
+  const content = document.getElementById(contentId);
+  const icon = document.getElementById(iconId);
+  const isActive = content.classList.contains('active');
+  
+  // Close all
+  document.querySelectorAll('.accordion-content').forEach(el => {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('[id^="icon-"]').forEach(el => {
+    el.style.transform = 'rotate(0deg)';
+  });
+  document.querySelectorAll('.mod-icon').forEach(el => {
+    el.classList.remove('bg-brand-accent', 'text-white', 'border-brand-accent');
+    el.classList.add('bg-brand-bg', 'text-brand-text', 'border-white/5');
+  });
+  
+  if (!isActive) {
+    content.classList.add('active');
+    icon.style.transform = 'rotate(180deg)';
+    const modIcon = btnEl.querySelector('.mod-icon');
+    modIcon.classList.remove('bg-brand-bg', 'text-brand-text', 'border-white/5');
+    modIcon.classList.add('bg-brand-accent', 'text-white', 'border-brand-accent');
+  }
+}
+
+function initChart() {
+  const ctx = document.getElementById('hoursChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Sincrónico (Contacto Directo)', 'Asincrónico (Práctica y Estudio)'],
+      datasets: [{
+        data: [65, 35],
+        backgroundColor: [
+          '#e4531b', // brand-accent
+          '#0a0c0b'  // brand-bg
+        ],
+        borderWidth: 1,
+        borderColor: '#1a1d1e',
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '70%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { family: 'Inter', size: 12, weight: '500' },
+            color: '#e5dcc3', // brand-text
+            padding: 25,
+            usePointStyle: true
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1a1d1e',
+          titleColor: '#a39f96',
+          bodyColor: '#e5dcc3',
+          titleFont: { family: 'Inter', size: 12 },
+          bodyFont: { family: 'Inter', size: 13, weight: 'bold' },
+          padding: 12,
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              return ' ' + context.parsed + ' Horas (' + context.label + ')';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function initGSAP() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Recalculate ScrollTrigger positions after all assets load to prevent hidden elements
+  window.addEventListener('load', () => {
+    ScrollTrigger.refresh();
+  });
+
+  // Hero Parallax
+  gsap.to('.hero-img', {
+    yPercent: 20,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#hero-section',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: true
+    }
+  });
+
+  // Timeline Hero
+  const tlHero = gsap.timeline();
+  tlHero.from('.hero-quote', { y: -40, opacity: 0, duration: 0.8, delay: 0.2 })
+        .from('.hero-stats > div', { y: 20, opacity: 0, duration: 0.6, stagger: 0.15 }, "-=0.3");
+
+  // Bento Cards Staggered
+  gsap.from(".bento-card", {
+    scrollTrigger: {
+      trigger: ".bento-grid",
+      start: "top 85%",
+      once: true
+    },
+    y: 40,
+    opacity: 0,
+    duration: 0.5,
+    stagger: 0.12,
+    clearProps: "all"
+  });
+
+  // Timeline Sections
+  const sections = document.querySelectorAll('section');
+  sections.forEach(sec => {
+    const title = sec.querySelector('h2');
+    const desc = sec.querySelector('p.max-w-2xl');
+    
+    if (title && desc) {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sec,
+          start: "top 85%",
+          once: true
+        }
+      });
+      tl.from(title, { y: -40, opacity: 0, duration: 0.8 })
+        .from(desc, { y: 20, opacity: 0, duration: 0.6 }, "-=0.3");
+    }
+  });
+
+  // Accordions and Lists staggered
+  gsap.from("#curriculum-container > div", {
+    scrollTrigger: {
+      trigger: "#curriculum-container",
+      start: "top 85%",
+      once: true
+    },
+    y: 40,
+    opacity: 0,
+    duration: 0.5,
+    stagger: 0.12,
+    clearProps: "all"
+  });
+
+  // Glass Cards with back.out scale
+  gsap.from(".glass-card", {
+    scrollTrigger: {
+      trigger: "#equipo",
+      start: "top 85%",
+      once: true
+    },
+    y: -80,
+    opacity: 0,
+    scale: 0.3,
+    duration: 1,
+    ease: "back.out(2)",
+    stagger: 0.2,
+    clearProps: "all"
+  });
+
+  // Dynamic Chart offset
+  gsap.from("#dinamica .grid > div, .chart-container", {
+    scrollTrigger: {
+      trigger: "#dinamica",
+      start: "top 85%",
+      once: true
+    },
+    x: -40, 
+    opacity: 0,
+    duration: 0.6,
+    stagger: 0.15,
+    clearProps: "all"
+  });
+
+  // Contact section
+  gsap.from("#contacto > div > div", {
+    scrollTrigger: {
+      trigger: "#contacto",
+      start: "top 85%",
+      once: true
+    },
+    x: -40, 
+    opacity: 0,
+    duration: 0.6,
+    stagger: 0.15,
+    clearProps: "all"
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildCurriculum();
+  initChart();
+  
+  // Give DOM a small moment to paint before GSAP calculations
+  setTimeout(initGSAP, 100);
+  
+  // Set initial state for the first accordion icon
+  const firstModIcon = document.querySelector('.mod-icon');
+  if(firstModIcon) {
+    firstModIcon.classList.remove('bg-brand-bg', 'text-brand-text', 'border-white/5');
+    firstModIcon.classList.add('bg-brand-accent', 'text-white', 'border-brand-accent');
+  }
+});
+</script>
+</body>
+</html>
